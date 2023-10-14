@@ -1,6 +1,8 @@
 # dependencies
+.idea
 /server/node_modules
 /server/.pnp
+/server/.idea
 .pnp.js
 
 # testing

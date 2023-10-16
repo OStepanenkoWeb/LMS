@@ -2,8 +2,9 @@ import userModel, { type IUser } from '../models/user.model'
 import { type NextFunction, type Response, type Request } from 'express'
 import ErrorHandler from '../utils/errorHandler'
 import { CatchAsyncError } from '../middleware/catchAsyncError'
-import jwt, { type Secret } from 'jsonwebtoken'
+import jwt, { type JwtPayload, type Secret } from 'jsonwebtoken'
 import sendMail from '../utils/sendMail'
+import { accessTokenOptions, refreshTokenOptions, sendToken } from '../utils/jwt'
 import { sendToken } from '../utils/jwt'
 import { redis } from '../utils/redis'
 
@@ -161,6 +162,46 @@ export const logoutUser = CatchAsyncError(async (req: Request, res: Response, ne
     res.status(200).json({
       success: true,
       message: 'Logged out successfully'
+    })
+  } catch (error: any) {
+    next(new ErrorHandler(error.message, 400))
+  }
+})
+
+// update access token
+export const updateAccessToken = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const refreshToken = req.cookies.refresh_token as string
+    const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN as string) as JwtPayload
+
+    const message = 'Could not refresh token'
+
+    if (!decoded) {
+      next(new ErrorHandler(message, 400))
+    }
+
+    const session = await redis.get(decoded.id as string)
+
+    if (!session) {
+      next(new ErrorHandler(message, 400))
+    }
+
+    const user = JSON.parse(session)
+
+    const accessToken = jwt.sign({ id: user.__id }, process.env.ACCESS_TOKEN as string, {
+      expiresIn: '5m'
+    })
+
+    const newRefreshToken = jwt.sign({ id: user.__id }, process.env.REFRESH_TOKEN as string, {
+      expiresIn: '3d'
+    })
+
+    res.cookie('access_token', accessToken, accessTokenOptions)
+    res.cookie('refresh_token', newRefreshToken, refreshTokenOptions)
+
+    res.status(200).json({
+      status: 'success',
+      accessToken
     })
   } catch (error: any) {
     next(new ErrorHandler(error.message, 400))

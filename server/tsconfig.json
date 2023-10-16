@@ -10,7 +10,7 @@
     "lib": [
       "decorators",
       "dom",
-      "es5",
+      "ES2019",
       "scripthost",
       "es2015.promise"
     ],

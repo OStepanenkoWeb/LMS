@@ -8,7 +8,7 @@
         "ecmaVersion": "latest"
     },
     "rules": {
-        "@typescript-eslint/strict-boolean-expressions": "warn",
+        "@typescript-eslint/strict-boolean-expressions": 0,
         "@typescript-eslint/no-var-requires": "off"
     }
 }

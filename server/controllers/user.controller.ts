@@ -5,6 +5,7 @@ import { CatchAsyncError } from '../middleware/catchAsyncError'
 import jwt, { type JwtPayload, type Secret } from 'jsonwebtoken'
 import sendMail from '../utils/sendMail'
 import { accessTokenOptions, refreshTokenOptions, sendToken } from '../utils/jwt'
+import { sendToken } from '../utils/jwt'
 import { redis } from '../utils/redis'
 
 require('dotenv').config()
@@ -155,6 +156,9 @@ export const logoutUser = CatchAsyncError(async (req: Request, res: Response, ne
   try {
     res.cookie('access_token', '', { maxAge: 1 })
     res.cookie('refresh_token', '', { maxAge: 1 })
+
+    await redis.del(req.user?._id || '')
+
     res.status(200).json({
       success: true,
       message: 'Logged out successfully'

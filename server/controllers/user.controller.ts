@@ -5,8 +5,9 @@ import { CatchAsyncError } from '../middleware/catchAsyncError'
 import jwt, { type JwtPayload, type Secret } from 'jsonwebtoken'
 import sendMail from '../utils/sendMail'
 import { accessTokenOptions, refreshTokenOptions, sendToken } from '../utils/jwt'
-import { sendToken } from '../utils/jwt'
+
 import { redis } from '../utils/redis'
+import { getUserById } from '../services/user.services'
 
 require('dotenv').config()
 
@@ -196,6 +197,8 @@ export const updateAccessToken = CatchAsyncError(async (req: Request, res: Respo
       expiresIn: '3d'
     })
 
+    req.user = user
+
     res.cookie('access_token', accessToken, accessTokenOptions)
     res.cookie('refresh_token', newRefreshToken, refreshTokenOptions)
 
@@ -204,6 +207,124 @@ export const updateAccessToken = CatchAsyncError(async (req: Request, res: Respo
       accessToken
     })
   } catch (error: any) {
+    next(new ErrorHandler(error.message, 400))
+  }
+})
+
+// get user info
+export const getUserInfo = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user?._id
+
+    await getUserById(userId, res)
+  } catch (error) {
+    next(new ErrorHandler(error.message, 400))
+  }
+})
+
+// social auth
+export const socialAuth = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email, name, avatar } = req.body
+    const password: string = 'testpsw' // TODO implement password generation for those registered via a social network
+
+    const user = await userModel.findOne({ email }) as IUser
+
+    if (!user) {
+      const newUser = await userModel.create({ email, name, password, avatar }) as IUser
+
+      await sendToken(newUser, 200, res)
+    } else {
+      await sendToken(user, 200, res)
+    }
+  } catch (error) {
+    next(new ErrorHandler(error.message, 400))
+  }
+})
+
+// update user info
+interface IUpdateUserInfo {
+  email: string
+  name: string
+}
+
+export const updateUserInfo = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email, name } = req.body as IUpdateUserInfo
+    const userId = req.user?._id
+    const user = await userModel.findById(userId) as IUser
+
+    if (email && user) {
+      const isEmailExist = await userModel.findOne({ email })
+
+      if (isEmailExist) {
+        next(new ErrorHandler('Email already exist', 400))
+
+        return
+      }
+      user.email = email
+    }
+
+    if (name && user) {
+      user.name = name
+    }
+
+    await user?.save()
+
+    await redis.set(userId, JSON.stringify(user))
+
+    res.status(201).json({
+      success: true,
+      user
+    })
+  } catch (error) {
+    next(new ErrorHandler(error.message, 400))
+  }
+})
+
+// update user password
+interface IUpdateUserPassword {
+  oldPassword: string
+  newPassword: string
+}
+
+export const updatePassword = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { oldPassword, newPassword } = req.body as IUpdateUserPassword
+
+    if (!oldPassword || !newPassword) {
+      next(new ErrorHandler('Please enter old and new password', 400))
+
+      return
+    }
+
+    const user = await userModel.findById(req.user?._id).select('+password') as IUser
+
+    if (!user.password) {
+      next(new ErrorHandler('Invalid user', 400))
+
+      return
+    }
+
+    const isPasswordMatch = await user?.comparePassword(oldPassword)
+
+    if (!isPasswordMatch) {
+      next(new ErrorHandler('Invalid old password', 400))
+
+      return
+    }
+
+    user.password = newPassword
+
+    await user.save()
+
+    await redis.set(req.user?._id, JSON.stringify(user))
+
+    res.status(201).json({
+      success: true,
+      user
+    })
+  } catch (error) {
     next(new ErrorHandler(error.message, 400))
   }
 })

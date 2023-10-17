@@ -10,10 +10,7 @@ export interface IUser extends Document {
   email: string
   name: string
   password: string
-  avatar: {
-    public_id: string
-    url: string
-  }
+  avatar?: string
   role: string
   isVerified: boolean
   courses: Array<{ courseId: string }>
@@ -44,10 +41,7 @@ const userSchema: Schema<IUser> = new mongoose.Schema<IUser>({
     minlength: [6, 'Password must be at least 6 characters'],
     select: false
   },
-  avatar: {
-    public_id: String,
-    url: String
-  },
+  avatar: String,
   role: {
     type: String,
     default: 'user'

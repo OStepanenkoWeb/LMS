@@ -1,4 +1,5 @@
 import userRouter from './routes/route.user'
+import courseRouter from './routes/course.route'
 import express, { type NextFunction, type Request, type Response } from 'express'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
@@ -22,6 +23,8 @@ app.use(cors({
 // routes
 
 app.use('/api/v1', userRouter)
+
+app.use('/api/v1', courseRouter)
 
 // testing api
 

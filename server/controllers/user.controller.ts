@@ -42,7 +42,7 @@ export const registrationUser = CatchAsyncError(async (req: Request, res: Respon
     const activationToken = createActivationToken(user)
     const activationCode = activationToken.activationCode
     const data = { user: { name: user.name }, activationCode }
-    console.log(user)
+
     try {
       await sendMail({
         email: user.email,
@@ -180,7 +180,6 @@ export const updateAccessToken = CatchAsyncError(async (req: Request, res: Respo
     if (!decoded) {
       next(new ErrorHandler(message, 400))
     }
-
     const session = await redis.get(decoded.id as string)
 
     if (!session) {
@@ -189,11 +188,11 @@ export const updateAccessToken = CatchAsyncError(async (req: Request, res: Respo
 
     const user = JSON.parse(session)
 
-    const accessToken = jwt.sign({ id: user.__id }, process.env.ACCESS_TOKEN as string, {
+    const accessToken = jwt.sign({ id: user._id }, process.env.ACCESS_TOKEN as string, {
       expiresIn: '5m'
     })
 
-    const newRefreshToken = jwt.sign({ id: user.__id }, process.env.REFRESH_TOKEN as string, {
+    const newRefreshToken = jwt.sign({ id: user._id }, process.env.REFRESH_TOKEN as string, {
       expiresIn: '3d'
     })
 
@@ -319,6 +318,32 @@ export const updatePassword = CatchAsyncError(async (req: Request, res: Response
     await user.save()
 
     await redis.set(req.user?._id, JSON.stringify(user))
+
+    res.status(201).json({
+      success: true,
+      user
+    })
+  } catch (error) {
+    next(new ErrorHandler(error.message, 400))
+  }
+})
+
+// update profile picture
+export const updateProfilePicture = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { avatar } = req.body
+
+    const userId = req.user?._id
+
+    const user = await userModel.findById(userId) as IUser
+
+    if (avatar && user) {
+      user.avatar = avatar
+    }
+
+    await user.save()
+
+    await redis.set(userId, JSON.stringify(user))
 
     res.status(201).json({
       success: true,

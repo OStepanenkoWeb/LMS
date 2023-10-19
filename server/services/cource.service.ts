@@ -1,7 +1,8 @@
-import { type Response, type Request } from 'express'
+import { type Response, type Request, type NextFunction } from 'express'
 import { CatchAsyncError } from '../middleware/catchAsyncError'
-import CourseModel from '../models/course.model'
+import CourseModel, { ICourceData, type ICourse } from '../models/course.model'
 import { redis } from '../utils/redis'
+import ErrorHandler from '../utils/errorHandler'
 
 // create course
 export const createCourse = CatchAsyncError(async (req: Request, res: Response) => {
@@ -76,4 +77,30 @@ export const getAllCoursesList = CatchAsyncError(async (req: Request, res: Respo
     success: true,
     courses
   })
+})
+
+// get course content by user
+export const getCourseByUserId = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  const userCourseList = req.user?.courses
+  const courseId = req.params.id
+
+  if (userCourseList) {
+    const courseExists = userCourseList.find((course: any): boolean => {
+      return course.courseId === courseId
+    })
+
+    if (!courseExists) {
+      next(new ErrorHandler('You are not eligible to access this course', 404)); return
+    }
+
+    const course = await CourseModel.findById(courseId) as ICourse
+
+    const content = course.courseData
+
+    res.status(200).json({
+      success: true,
+      content
+    })
+  }
+  next(new ErrorHandler('The user does not have a list of courses', 404))
 })

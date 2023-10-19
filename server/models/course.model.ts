@@ -18,7 +18,7 @@ interface ILink extends Document {
   url: string
 }
 
-interface ICourceData extends Document {
+interface ICourseData extends Document {
   title: string
   description: string
   videoUrl: string
@@ -31,7 +31,7 @@ interface ICourceData extends Document {
   questions: IComment[]
 }
 
-interface ICourse extends Document {
+export interface ICourse extends Document {
   name: string
   description?: string
   price: number
@@ -43,7 +43,7 @@ interface ICourse extends Document {
   benefits: Array<{ title: string }>
   prerequisites: Array<{ title: string }>
   reviews: IReview[]
-  courseData: ICourceData[]
+  courseData: ICourseData[]
   ratings?: number
   purchased?: number
 }

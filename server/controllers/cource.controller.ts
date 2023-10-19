@@ -1,7 +1,13 @@
 import { type NextFunction, type Request, type Response } from 'express'
 import { CatchAsyncError } from '../middleware/catchAsyncError'
 import ErrorHandler from '../utils/errorHandler'
-import { createCourse, getAllCoursesList, getCourseById, updateCourse } from '../services/cource.service'
+import {
+  createCourse,
+  getAllCoursesList,
+  getCourseById,
+  getCourseByUserId,
+  updateCourse
+} from '../services/cource.service'
 
 // upload course
 export const uploadCourse = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
@@ -34,6 +40,15 @@ export const getSingleCourse = CatchAsyncError(async (req: Request, res: Respons
 export const getAllCourses = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
   try {
     getAllCoursesList(req, res, next)
+  } catch (error: any) {
+    next(new ErrorHandler(error.message, 400))
+  }
+})
+
+// get course content -- only for valid user
+export const getCourseByUser = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    getCourseByUserId(req, res, next)
   } catch (error: any) {
     next(new ErrorHandler(error.message, 400))
   }

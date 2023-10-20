@@ -2,6 +2,8 @@ import { type NextFunction, type Request, type Response } from 'express'
 import { CatchAsyncError } from '../middleware/catchAsyncError'
 import ErrorHandler from '../utils/errorHandler'
 import {
+  addAnswerQuestionService,
+  addQuestionService,
   createCourse,
   getAllCoursesList,
   getCourseById,
@@ -14,7 +16,7 @@ export const uploadCourse = CatchAsyncError(async (req: Request, res: Response, 
   try {
     createCourse(req, res, next)
   } catch (error: any) {
-    next(new ErrorHandler(error.message, 400))
+    next(new ErrorHandler(error.message, 500))
   }
 })
 
@@ -23,7 +25,7 @@ export const editCourse = CatchAsyncError(async (req: Request, res: Response, ne
   try {
     updateCourse(req, res, next)
   } catch (error: any) {
-    next(new ErrorHandler(error.message, 400))
+    next(new ErrorHandler(error.message, 500))
   }
 })
 
@@ -32,7 +34,7 @@ export const getSingleCourse = CatchAsyncError(async (req: Request, res: Respons
   try {
     getCourseById(req, res, next)
   } catch (error: any) {
-    next(new ErrorHandler(error.message, 400))
+    next(new ErrorHandler(error.message, 500))
   }
 })
 
@@ -41,7 +43,7 @@ export const getAllCourses = CatchAsyncError(async (req: Request, res: Response,
   try {
     getAllCoursesList(req, res, next)
   } catch (error: any) {
-    next(new ErrorHandler(error.message, 400))
+    next(new ErrorHandler(error.message, 500))
   }
 })
 
@@ -50,6 +52,25 @@ export const getCourseByUser = CatchAsyncError(async (req: Request, res: Respons
   try {
     getCourseByUserId(req, res, next)
   } catch (error: any) {
-    next(new ErrorHandler(error.message, 400))
+    next(new ErrorHandler(error.message, 500))
+  }
+})
+
+// add questions in course
+
+export const addQuestion = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    addQuestionService(req, res, next)
+  } catch (error: any) {
+    next(new ErrorHandler(error.message, 500))
+  }
+})
+
+// add answer in course question
+export const addAnswerQuestion = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    addAnswerQuestionService(req, res, next)
+  } catch (error: any) {
+    next(new ErrorHandler(error.message, 500))
   }
 })

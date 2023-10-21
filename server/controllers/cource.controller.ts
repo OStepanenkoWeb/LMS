@@ -3,7 +3,7 @@ import { CatchAsyncError } from '../middleware/catchAsyncError'
 import ErrorHandler from '../utils/errorHandler'
 import {
   addAnswerQuestionService,
-  addQuestionService,
+  addQuestionService, addReplyToReviewService, addReviewCourseService,
   createCourse,
   getAllCoursesList,
   getCourseById,
@@ -70,6 +70,25 @@ export const addQuestion = CatchAsyncError(async (req: Request, res: Response, n
 export const addAnswerQuestion = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
   try {
     addAnswerQuestionService(req, res, next)
+  } catch (error: any) {
+    next(new ErrorHandler(error.message, 500))
+  }
+})
+
+// add review in course
+export const addReviewCourse = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    addReviewCourseService(req, res, next)
+  } catch (error: any) {
+    next(new ErrorHandler(error.message, 500))
+  }
+})
+
+// add reply in review
+
+export const addReplyToReview = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    addReplyToReviewService(req, res, next)
   } catch (error: any) {
     next(new ErrorHandler(error.message, 500))
   }

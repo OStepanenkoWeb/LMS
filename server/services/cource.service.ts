@@ -8,6 +8,7 @@ import path from 'path'
 import ejs from 'ejs'
 import sendMail from '../utils/sendMail'
 import { IUser } from '../models/user.model'
+import NotificationModel from '../models/notification.model'
 
 // create course
 export const createCourse = CatchAsyncError(async (req: Request, res: Response) => {
@@ -143,6 +144,12 @@ export const addQuestionService = CatchAsyncError(async (req: Request, res: Resp
 
   courseContent.questions.push(newQuestion)
 
+  await NotificationModel.create({
+    user: req.user?._id,
+    title: 'New Question Received',
+    message: `You have a new question in ${courseContent.title}`
+  })
+
   // save the update course
   await course?.save()
 
@@ -197,7 +204,11 @@ export const addAnswerQuestionService = CatchAsyncError(async (req: Request, res
 
   if (req.user?._id === question.user?._id) {
     // create a notification
-
+    await NotificationModel.create({
+      user: req.user?._id,
+      title: 'New Question Reply Received',
+      message: `You have a new question reply in ${courseContent.title}`
+    })
   } else {
     const data = {
       name: question.user.name,

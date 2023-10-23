@@ -1,9 +1,11 @@
-import userRouter from './routes/route.user'
+import userRouter from './routes/user.route'
 import courseRouter from './routes/course.route'
+import orderRouter from './routes/order.route'
 import express, { type NextFunction, type Request, type Response } from 'express'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import { ErrorMiddleware } from './middleware/error'
+import notificationRouter from './routes/notification.route'
 
 require('dotenv').config()
 export const app = express()
@@ -22,9 +24,7 @@ app.use(cors({
 
 // routes
 
-app.use('/api/v1', userRouter)
-
-app.use('/api/v1', courseRouter)
+app.use('/api/v1', userRouter, courseRouter, orderRouter, notificationRouter)
 
 // testing api
 

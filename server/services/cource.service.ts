@@ -1,16 +1,14 @@
 import { type Response, type Request, type NextFunction } from 'express'
-import { CatchAsyncError } from '../middleware/catchAsyncError'
-import CourseModel, { type IComment, ICourceData, type ICourse, type IReview } from '../models/course.model'
+import CourseModel, { type IComment, type ICourse } from '../models/course.model'
 import { redis } from '../utils/redis'
 import ErrorHandler from '../utils/errorHandler'
 import mongoose from 'mongoose'
-import path from 'path'
-import ejs from 'ejs'
 import sendMail from '../utils/sendMail'
-import { IUser } from '../models/user.model'
+import NotificationModel from '../models/notification.model'
+import courseModel from '../models/course.model'
 
 // create course
-export const createCourse = CatchAsyncError(async (req: Request, res: Response) => {
+export const createCourse = async (req: Request, res: Response): Promise<void> => {
   const data = req.body
 
   const course = await CourseModel.create(data)
@@ -19,10 +17,10 @@ export const createCourse = CatchAsyncError(async (req: Request, res: Response) 
     success: true,
     course
   })
-})
+}
 
 // update course
-export const updateCourse = CatchAsyncError(async (req: Request, res: Response) => {
+export const updateCourse = async (req: Request, res: Response): Promise<void> => {
   const data = req.body
 
   const courseId = req.params.id
@@ -36,10 +34,10 @@ export const updateCourse = CatchAsyncError(async (req: Request, res: Response) 
     success: true,
     course
   })
-})
+}
 
 // get course by id
-export const getCourseById = CatchAsyncError(async (req: Request, res: Response) => {
+export const getCourseById = async (req: Request, res: Response): Promise<void> => {
   const courseId = req.params.id
 
   const isCacheExist = await redis.get(courseId)
@@ -60,10 +58,10 @@ export const getCourseById = CatchAsyncError(async (req: Request, res: Response)
     success: true,
     course
   })
-})
+}
 
 // get all courses
-export const getAllCoursesList = CatchAsyncError(async (req: Request, res: Response) => {
+export const getAllCoursesList = async (req: Request, res: Response): Promise<void> => {
   const isCacheExist = await redis.get('allCourses')
 
   let courses = null
@@ -82,10 +80,10 @@ export const getAllCoursesList = CatchAsyncError(async (req: Request, res: Respo
     success: true,
     courses
   })
-})
+}
 
 // get course content by user
-export const getCourseByUserId = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+export const getCourseByUserId = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const userCourseList = req.user?.courses
   const courseId = req.params.id
 
@@ -108,7 +106,7 @@ export const getCourseByUserId = CatchAsyncError(async (req: Request, res: Respo
     })
   }
   next(new ErrorHandler('The user does not have a list of courses', 400))
-})
+}
 
 // add questions in course
 interface IAddQuestionData {
@@ -117,7 +115,7 @@ interface IAddQuestionData {
   contentId: string
 }
 
-export const addQuestionService = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+export const addQuestionService = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { question, courseId, contentId }: IAddQuestionData = req.body
   const course = await CourseModel.findById(courseId) as ICourse
 
@@ -143,6 +141,12 @@ export const addQuestionService = CatchAsyncError(async (req: Request, res: Resp
 
   courseContent.questions.push(newQuestion)
 
+  await NotificationModel.create({
+    user: req.user?._id,
+    title: 'New Question Received',
+    message: `You have a new question in ${courseContent.title}`
+  })
+
   // save the update course
   await course?.save()
 
@@ -150,7 +154,7 @@ export const addQuestionService = CatchAsyncError(async (req: Request, res: Resp
     success: true,
     course
   })
-})
+}
 
 // add answer in course question
 
@@ -161,7 +165,7 @@ interface IAddAnswerData {
   questionId: string
 }
 
-export const addAnswerQuestionService = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+export const addAnswerQuestionService = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { answer, courseId, contentId, questionId }: IAddAnswerData = req.body
   const course = await CourseModel.findById(courseId) as ICourse
 
@@ -197,7 +201,11 @@ export const addAnswerQuestionService = CatchAsyncError(async (req: Request, res
 
   if (req.user?._id === question.user?._id) {
     // create a notification
-
+    await NotificationModel.create({
+      user: req.user?._id,
+      title: 'New Question Reply Received',
+      message: `You have a new question reply in ${courseContent.title}`
+    })
   } else {
     const data = {
       name: question.user.name,
@@ -221,7 +229,7 @@ export const addAnswerQuestionService = CatchAsyncError(async (req: Request, res
     success: true,
     course
   })
-})
+}
 
 // add review in course
 interface IAddReviewData {
@@ -231,7 +239,7 @@ interface IAddReviewData {
   userId: string
 }
 
-export const addReviewCourseService = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+export const addReviewCourseService = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const userCourseList = req.user?.courses
   const courseId = req.params.id
 
@@ -274,7 +282,7 @@ export const addReviewCourseService = CatchAsyncError(async (req: Request, res: 
     success: true,
     course
   })
-})
+}
 
 // add reply in review
 interface IAddReplyReviewData {
@@ -283,7 +291,7 @@ interface IAddReplyReviewData {
   reviewId: string
 }
 
-export const addReplyToReviewService = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+export const addReplyToReviewService = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { courseId, comment, reviewId } = req.body as IAddReplyReviewData
 
   const course = await CourseModel.findById(courseId) as ICourse
@@ -317,4 +325,36 @@ export const addReplyToReviewService = CatchAsyncError(async (req: Request, res:
     success: true,
     course
   })
-})
+}
+
+// get all courses
+export const getAllFullCoursesService = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  const courses = await courseModel.find().sort({ createdAt: -1 })
+
+  res.status(210).json({
+    success: true,
+    courses
+  })
+}
+
+// delete course
+
+export const deleteCourseService = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  const { id } = req.params
+
+  const course = await courseModel.findById(id)
+
+  if (!course) {
+    next(new ErrorHandler('Course not found', 404))
+    return
+  }
+
+  await course.deleteOne({ id })
+
+  await redis.del(id)
+
+  res.status(200).json({
+    success: true,
+    message: 'Course deleted successfully'
+  })
+}

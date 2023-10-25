@@ -7,7 +7,8 @@ import sendMail from '../utils/sendMail'
 import { accessTokenOptions, refreshTokenOptions, sendToken } from '../utils/jwt'
 
 import { redis } from '../utils/redis'
-import { getUserById } from '../services/user.services'
+import { deleteUserService, getAllUsersService, getUserById, updateUserRoleService } from '../services/user.services'
+import { updateNotificationsService } from '../services/notification.service'
 
 require('dotenv').config()
 
@@ -183,7 +184,7 @@ export const updateAccessToken = CatchAsyncError(async (req: Request, res: Respo
     const session = await redis.get(decoded.id as string)
 
     if (!session) {
-      next(new ErrorHandler(message, 400))
+      next(new ErrorHandler('Please login for access this resources', 400))
     }
 
     const user = JSON.parse(session)
@@ -200,6 +201,8 @@ export const updateAccessToken = CatchAsyncError(async (req: Request, res: Respo
 
     res.cookie('access_token', accessToken, accessTokenOptions)
     res.cookie('refresh_token', newRefreshToken, refreshTokenOptions)
+
+    await redis.set(user._id, JSON.stringify(user), 'EX', 604800) // 7 days
 
     res.status(200).json({
       status: 'success',
@@ -351,5 +354,32 @@ export const updateProfilePicture = CatchAsyncError(async (req: Request, res: Re
     })
   } catch (error) {
     next(new ErrorHandler(error.message, 400))
+  }
+})
+
+// get all users
+export const getAllUsers = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await getAllUsersService(req, res, next)
+  } catch (error: any) {
+    next(new ErrorHandler(error.message, 500))
+  }
+})
+
+// update user role
+export const updateUserRole = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await updateUserRoleService(req, res, next)
+  } catch (error: any) {
+    next(new ErrorHandler(error.message, 500))
+  }
+})
+
+// delete user
+export const deleteUser = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await deleteUserService(req, res, next)
+  } catch (error: any) {
+    next(new ErrorHandler(error.message, 500))
   }
 })

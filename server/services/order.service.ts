@@ -7,9 +7,11 @@ import ErrorHandler from '../utils/errorHandler'
 import path from 'path'
 import sendMail from '../utils/sendMail'
 import NotificationModel from '../models/notification.model'
+import courseModel from '../models/course.model'
+import orderModel from '../models/order.model'
 
 // create order
-export const createOrderService = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+export const createOrderService = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { courseId, paymentInfo } = req.body as IOrder
 
   const user = await userModel.findById(req.user?._id) as IUser
@@ -77,4 +79,14 @@ export const createOrderService = CatchAsyncError(async (req: Request, res: Resp
     success: true,
     order
   })
-})
+}
+
+// get all orders
+export const getAllOrdersService = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  const orders = await orderModel.find().sort({ createdAt: -1 })
+
+  res.status(210).json({
+    success: true,
+    orders
+  })
+}

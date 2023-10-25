@@ -1,9 +1,9 @@
 import express from 'express'
 import {
   addAnswerQuestion,
-  addQuestion, addReplyToReview, addReviewCourse,
+  addQuestion, addReplyToReview, addReviewCourse, deleteCourse,
   editCourse,
-  getAllCourses,
+  getAllCourses, getAllFullCourses,
   getCourseByUser,
   getSingleCourse,
   uploadCourse
@@ -29,5 +29,9 @@ courseRouter.put('/add-answer', isAuthenticated, addAnswerQuestion)
 courseRouter.put('/add-review/:id', isAuthenticated, addReviewCourse)
 
 courseRouter.put('/add-reply', isAuthenticated, authorizeRoles('admin'), addReplyToReview)
+
+courseRouter.get('/get-full-courses', isAuthenticated, getAllFullCourses)
+
+courseRouter.delete('/delete-course/:id', isAuthenticated, authorizeRoles('admin'), deleteCourse)
 
 export default courseRouter

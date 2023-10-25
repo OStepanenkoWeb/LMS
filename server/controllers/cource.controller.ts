@@ -4,8 +4,8 @@ import ErrorHandler from '../utils/errorHandler'
 import {
   addAnswerQuestionService,
   addQuestionService, addReplyToReviewService, addReviewCourseService,
-  createCourse,
-  getAllCoursesList,
+  createCourse, deleteCourseService,
+  getAllCoursesList, getAllFullCoursesService,
   getCourseById,
   getCourseByUserId,
   updateCourse
@@ -14,7 +14,7 @@ import {
 // upload course
 export const uploadCourse = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
   try {
-    createCourse(req, res, next)
+    await createCourse(req, res, next)
   } catch (error: any) {
     next(new ErrorHandler(error.message, 500))
   }
@@ -23,7 +23,7 @@ export const uploadCourse = CatchAsyncError(async (req: Request, res: Response, 
 // edit course
 export const editCourse = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
   try {
-    updateCourse(req, res, next)
+    await updateCourse(req, res, next)
   } catch (error: any) {
     next(new ErrorHandler(error.message, 500))
   }
@@ -32,7 +32,7 @@ export const editCourse = CatchAsyncError(async (req: Request, res: Response, ne
 // get single course --- without purchasing
 export const getSingleCourse = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
   try {
-    getCourseById(req, res, next)
+    await getCourseById(req, res, next)
   } catch (error: any) {
     next(new ErrorHandler(error.message, 500))
   }
@@ -41,7 +41,7 @@ export const getSingleCourse = CatchAsyncError(async (req: Request, res: Respons
 // get all course --- without purchasing
 export const getAllCourses = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
   try {
-    getAllCoursesList(req, res, next)
+    await getAllCoursesList(req, res, next)
   } catch (error: any) {
     next(new ErrorHandler(error.message, 500))
   }
@@ -50,7 +50,7 @@ export const getAllCourses = CatchAsyncError(async (req: Request, res: Response,
 // get course content -- only for valid user
 export const getCourseByUser = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
   try {
-    getCourseByUserId(req, res, next)
+    await getCourseByUserId(req, res, next)
   } catch (error: any) {
     next(new ErrorHandler(error.message, 500))
   }
@@ -60,7 +60,7 @@ export const getCourseByUser = CatchAsyncError(async (req: Request, res: Respons
 
 export const addQuestion = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
   try {
-    addQuestionService(req, res, next)
+    await addQuestionService(req, res, next)
   } catch (error: any) {
     next(new ErrorHandler(error.message, 500))
   }
@@ -69,7 +69,7 @@ export const addQuestion = CatchAsyncError(async (req: Request, res: Response, n
 // add answer in course question
 export const addAnswerQuestion = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
   try {
-    addAnswerQuestionService(req, res, next)
+    await addAnswerQuestionService(req, res, next)
   } catch (error: any) {
     next(new ErrorHandler(error.message, 500))
   }
@@ -78,7 +78,7 @@ export const addAnswerQuestion = CatchAsyncError(async (req: Request, res: Respo
 // add review in course
 export const addReviewCourse = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
   try {
-    addReviewCourseService(req, res, next)
+    await addReviewCourseService(req, res, next)
   } catch (error: any) {
     next(new ErrorHandler(error.message, 500))
   }
@@ -88,7 +88,25 @@ export const addReviewCourse = CatchAsyncError(async (req: Request, res: Respons
 
 export const addReplyToReview = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
   try {
-    addReplyToReviewService(req, res, next)
+    await addReplyToReviewService(req, res, next)
+  } catch (error: any) {
+    next(new ErrorHandler(error.message, 500))
+  }
+})
+
+// get all courses
+export const getAllFullCourses = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await getAllFullCoursesService(req, res, next)
+  } catch (error: any) {
+    next(new ErrorHandler(error.message, 500))
+  }
+})
+
+// delete course
+export const deleteCourse = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await deleteCourseService(req, res, next)
   } catch (error: any) {
     next(new ErrorHandler(error.message, 500))
   }

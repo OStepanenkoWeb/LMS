@@ -10,6 +10,9 @@
   "author": "StepanenkoOV",
   "license": "ISC",
   "dependencies": {
+    "@types/node-cron": "^3.0.10",
+    "multer": "^1.4.5-lts.1",
+    "node-cron": "^3.0.2",
     "@types/bcryptjs": "^2.4.4",
     "@types/cookie-parser": "^1.4.4",
     "@types/cors": "^2.8.14",

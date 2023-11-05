@@ -7,8 +7,13 @@ import sendMail from '../utils/sendMail'
 import { accessTokenOptions, refreshTokenOptions, sendToken } from '../utils/jwt'
 
 import { redis } from '../utils/redis'
-import { deleteUserService, getAllUsersService, getUserById, updateUserRoleService } from '../services/user.services'
-import { updateNotificationsService } from '../services/notification.service'
+import {
+  deleteUserService,
+  getAllUsersService,
+  getUserById,
+  updateUserRoleService
+} from '../services/user.services'
+import * as process from 'process'
 
 require('dotenv').config()
 
@@ -334,14 +339,13 @@ export const updatePassword = CatchAsyncError(async (req: Request, res: Response
 // update profile picture
 export const updateProfilePicture = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { avatar } = req.body
+    const { filename } = req?.file
 
     const userId = req.user?._id
-
     const user = await userModel.findById(userId) as IUser
 
-    if (avatar && user) {
-      user.avatar = avatar
+    if (filename && user) {
+      user.avatar = filename
     }
 
     await user.save()

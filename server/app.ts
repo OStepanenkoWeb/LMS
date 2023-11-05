@@ -8,6 +8,7 @@ import { ErrorMiddleware } from './middleware/error'
 import notificationRouter from './routes/notification.route'
 import analyticsRouter from './routes/analytics.route'
 import layoutRouter from './routes/layout.route'
+import path from 'path'
 
 require('dotenv').config()
 export const app = express()
@@ -24,6 +25,8 @@ app.use(cors({
   origin: process.env.ORIGIN,
   credentials: true
 }))
+
+app.use(express.static(path.join(__dirname, '/public')))
 
 // routes
 

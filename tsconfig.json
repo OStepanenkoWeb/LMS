@@ -15,8 +15,6 @@
       "scripthost",
       "es2015.promise"
     ],
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
     "strictNullChecks": true
   }
 }

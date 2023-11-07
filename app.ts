@@ -2,7 +2,7 @@ import userRouter from './routes/user.route'
 import courseRouter from './routes/course.route'
 import orderRouter from './routes/order.route'
 import express, { type NextFunction, type Request, type Response } from 'express'
-import cors from 'cors'
+import {cors} from './middleware/cors'
 import cookieParser from 'cookie-parser'
 import { ErrorMiddleware } from './middleware/error'
 import notificationRouter from './routes/notification.route'
@@ -22,7 +22,7 @@ app.use(cookieParser())
 
 // cors
 app.use(cors({
-  origin: process.env.ORIGIN,
+  origin: process.env.ORIGIN || '',
   credentials: true
 }))
 

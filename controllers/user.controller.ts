@@ -97,7 +97,7 @@ export const activateUser = CatchAsyncError(async (req: Request, res: Response, 
 
     const newUser: { user: IUser, activationCode: string } = jwt.verify(
       activationToken,
-      process.env.ACTIVATION_SECRET
+      process.env.ACTIVATION_SECRET || ''
     ) as { user: IUser, activationCode: string }
 
     if (newUser.activationCode !== activationCode) {
@@ -121,8 +121,8 @@ export const activateUser = CatchAsyncError(async (req: Request, res: Response, 
     res.status(201).json({
       success: true
     })
-  } catch (error) {
-    next(new ErrorHandler(error.message, 400))
+  } catch (error: any) {
+    next(new ErrorHandler(error?.message, 400))
   }
 })
 
@@ -192,7 +192,7 @@ export const updateAccessToken = CatchAsyncError(async (req: Request, res: Respo
       next(new ErrorHandler('Please login for access this resources', 400))
     }
 
-    const user = JSON.parse(session)
+    const user = JSON.parse( session || '')
 
     const accessToken = jwt.sign({ id: user._id }, process.env.ACCESS_TOKEN as string, {
       expiresIn: '5m'
@@ -224,8 +224,8 @@ export const getUserInfo = CatchAsyncError(async (req: Request, res: Response, n
     const userId = req.user?._id
 
     await getUserById(userId, res)
-  } catch (error) {
-    next(new ErrorHandler(error.message, 400))
+  } catch (error: any) {
+    next(new ErrorHandler(error?.message, 400))
   }
 })
 
@@ -244,8 +244,8 @@ export const socialAuth = CatchAsyncError(async (req: Request, res: Response, ne
     } else {
       await sendToken(user, 200, res)
     }
-  } catch (error) {
-    next(new ErrorHandler(error.message, 400))
+  } catch (error: any) {
+    next(new ErrorHandler(error?.message, 400))
   }
 })
 
@@ -273,8 +273,8 @@ export const updateUserInfo = CatchAsyncError(async (req: Request, res: Response
       success: true,
       user
     })
-  } catch (error) {
-    next(new ErrorHandler(error.message, 400))
+  } catch (error: any) {
+    next(new ErrorHandler(error?.message, 400))
   }
 })
 
@@ -320,15 +320,15 @@ export const updatePassword = CatchAsyncError(async (req: Request, res: Response
       success: true,
       user
     })
-  } catch (error) {
-    next(new ErrorHandler(error.message, 400))
+  } catch (error: any) {
+    next(new ErrorHandler(error?.message, 400))
   }
 })
 
 // update profile picture
 export const updateProfilePicture = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { filename } = req?.file
+    const { filename } = req?.file as any
 
     const userId = req.user?._id
     const user = await userModel.findById(userId) as IUser
@@ -345,8 +345,8 @@ export const updateProfilePicture = CatchAsyncError(async (req: Request, res: Re
       success: true,
       user
     })
-  } catch (error) {
-    next(new ErrorHandler(error.message, 400))
+  } catch (error: any) {
+    next(new ErrorHandler(error?.message, 400))
   }
 })
 

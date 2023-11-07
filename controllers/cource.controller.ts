@@ -14,7 +14,7 @@ import {
 // upload course
 export const uploadCourse = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
   try {
-    await createCourse(req, res, next)
+    await createCourse(req, res)
   } catch (error: any) {
     next(new ErrorHandler(error.message, 500))
   }
@@ -23,7 +23,7 @@ export const uploadCourse = CatchAsyncError(async (req: Request, res: Response, 
 // edit course
 export const editCourse = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
   try {
-    await updateCourse(req, res, next)
+    await updateCourse(req, res)
   } catch (error: any) {
     next(new ErrorHandler(error.message, 500))
   }
@@ -32,7 +32,7 @@ export const editCourse = CatchAsyncError(async (req: Request, res: Response, ne
 // get single course --- without purchasing
 export const getSingleCourse = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
   try {
-    await getCourseById(req, res, next)
+    await getCourseById(req, res)
   } catch (error: any) {
     next(new ErrorHandler(error.message, 500))
   }
@@ -41,7 +41,7 @@ export const getSingleCourse = CatchAsyncError(async (req: Request, res: Respons
 // get all course --- without purchasing
 export const getAllCourses = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
   try {
-    await getAllCoursesList(req, res, next)
+    await getAllCoursesList(req, res)
   } catch (error: any) {
     next(new ErrorHandler(error.message, 500))
   }

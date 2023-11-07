@@ -6,7 +6,7 @@ const redisClient = (): string => {
   if (process.env.REDIS_URL !== null) {
     console.log('Redis connected')
 
-    return process.env.REDIS_URL
+    return process.env.REDIS_URL || ''
   }
   throw new Error('Redis connection failed')
 }

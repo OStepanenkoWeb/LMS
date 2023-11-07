@@ -139,12 +139,12 @@ export const addQuestionService = async (req: Request, res: Response, next: Next
 
   // add this question to course content
 
-  courseContent.questions.push(newQuestion)
+  courseContent?.questions.push(newQuestion)
 
   await NotificationModel.create({
     user: req.user?._id,
     title: 'New Question Received',
-    message: `You have a new question in ${courseContent.title}`
+    message: `You have a new question in ${courseContent?.title}`
   })
 
   // save the update course
@@ -192,29 +192,31 @@ export const addAnswerQuestionService = async (req: Request, res: Response, next
   }
 
   // add this answer to our course content
-  if (!question.questionReplies) {
-    question.questionReplies = []
+  if (!question?.questionReplies) {
+    if(question) {
+      question.questionReplies = []
+    }
   }
-  question.questionReplies?.push<IComment>(newAnswer)
+  question?.questionReplies?.push(newAnswer)
 
   await course.save()
 
-  if (req.user?._id === question.user?._id) {
+  if (req.user?._id === question?.user?._id) {
     // create a notification
     await NotificationModel.create({
       user: req.user?._id,
       title: 'New Question Reply Received',
-      message: `You have a new question reply in ${courseContent.title}`
+      message: `You have a new question reply in ${courseContent?.title}`
     })
   } else {
     const data = {
-      name: question.user.name,
-      title: courseContent.title
+      name: question?.user?.name,
+      title: courseContent?.title
     }
 
     try {
       await sendMail({
-        email: question.user.email,
+        email: question?.user?.email || '',
         subject: 'Question Reply',
         template: 'question-reply.ejs',
         data

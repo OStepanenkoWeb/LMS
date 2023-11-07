@@ -1,4 +1,4 @@
-import mongoose, { type Document, type Model, type Schema } from 'mongoose'
+import mongoose, {type Document, type Model, type Schema, ValidateOpts} from 'mongoose'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
@@ -29,11 +29,11 @@ const userSchema: Schema<IUser> = new mongoose.Schema<IUser>({
     required: [true, 'Please enter your email'],
     validate: {
       validator: function (value: string) {
-        return emailRegexPattern.test(value)
+        return Boolean(emailRegexPattern.test(value))
       },
       message: 'please enter a valid email',
       unique: true
-    }
+    } as ValidateOpts<any>
   },
   password: {
     type: String,

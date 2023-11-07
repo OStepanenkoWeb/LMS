@@ -257,20 +257,9 @@ interface IUpdateUserInfo {
 
 export const updateUserInfo = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { email, name } = req.body as IUpdateUserInfo
+    const { name } = req.body as IUpdateUserInfo
     const userId = req.user?._id
     const user = await userModel.findById(userId) as IUser
-
-    if (email && user) {
-      const isEmailExist = await userModel.findOne({ email })
-
-      if (isEmailExist) {
-        next(new ErrorHandler('Email already exist', 400))
-
-        return
-      }
-      user.email = email
-    }
 
     if (name && user) {
       user.name = name
@@ -300,7 +289,7 @@ export const updatePassword = CatchAsyncError(async (req: Request, res: Response
     const { oldPassword, newPassword } = req.body as IUpdateUserPassword
 
     if (!oldPassword || !newPassword) {
-      next(new ErrorHandler('Please enter old and new password', 400))
+      next(new ErrorHandler('Пожалуйста введите свои старый и новый пароли', 400))
 
       return
     }
@@ -316,7 +305,7 @@ export const updatePassword = CatchAsyncError(async (req: Request, res: Response
     const isPasswordMatch = await user?.comparePassword(oldPassword)
 
     if (!isPasswordMatch) {
-      next(new ErrorHandler('Invalid old password', 400))
+      next(new ErrorHandler('Старый пароль введен не правильно', 400))
 
       return
     }

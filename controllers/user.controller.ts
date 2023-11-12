@@ -328,13 +328,12 @@ export const updatePassword = CatchAsyncError(async (req: Request, res: Response
 // update profile picture
 export const updateProfilePicture = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { filename } = req?.file as any
-
+    const { avatar, body } = req.body
     const userId = req.user?._id
     const user = await userModel.findById(userId) as IUser
 
-    if (filename && user) {
-      user.avatar = filename
+    if (avatar && user) {
+      user.avatar = avatar
     }
 
     await user.save()

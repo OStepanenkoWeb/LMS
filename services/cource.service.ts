@@ -66,15 +66,9 @@ export const getAllCoursesList = async (req: Request, res: Response): Promise<vo
 
   let courses = null
 
-  if (isCacheExist) {
-    courses = JSON.parse(isCacheExist)
-  } else {
-    courses = await CourseModel
+  courses = await CourseModel
       .find()
       .select('-courseData.videoUrl -courseData.suggestion -courseData.questions -courseData.links')
-
-    await redis.set('allCourses', JSON.stringify(courses))
-  }
 
   res.status(200).json({
     success: true,

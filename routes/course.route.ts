@@ -31,7 +31,7 @@ courseRouter.put('/add-review/:id', updateAccessToken, isAuthenticated, addRevie
 
 courseRouter.put('/add-reply', updateAccessToken, isAuthenticated, authorizeRoles('admin'), addReplyToReview)
 
-courseRouter.get('/get-full-courses', updateAccessToken, isAuthenticated, getAllFullCourses)
+courseRouter.get('/get-full-courses', updateAccessToken, isAuthenticated, authorizeRoles('admin'), getAllFullCourses)
 
 courseRouter.delete('/delete-course/:id', updateAccessToken, isAuthenticated, authorizeRoles('admin'), deleteCourse)
 

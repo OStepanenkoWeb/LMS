@@ -18,9 +18,11 @@ export const createLayoutService = async (req: Request, res: Response, next: Nex
 
     const banner = {
       type: 'Banner',
-      image: { url: image },
-      title,
-      subTitle
+      banner: {
+        image,
+        title,
+        subTitle
+      }
     }
 
     await LayoutModel.create(banner)
@@ -70,7 +72,7 @@ export const editLayoutService = async (req: Request, res: Response, next: NextF
 
     const banner = {
       type: 'Banner',
-      image: { url: image },
+      image,
       title,
       subTitle
     }
@@ -118,10 +120,10 @@ export const editLayoutService = async (req: Request, res: Response, next: NextF
 // get layout
 
 export const getLayoutByTypeService = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  const { type } = req.body
-  const layout = await LayoutModel.findOne(type)
+  const type= req.params.type as string
+  const layout = await LayoutModel.findOne({type})
 
-  res.status(201).json({
+  res.status(200).json({
     success: true,
     layout
   })

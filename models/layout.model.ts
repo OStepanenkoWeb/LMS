@@ -9,13 +9,8 @@ export interface ICategory extends Document {
   title: string
 }
 
-interface IBannerImage extends Document {
-  public_id: string
-  url: string
-}
-
 export interface IBanner {
-  image: IBannerImage
+  image: string
   title: string
   subTitle: string
 }
@@ -36,17 +31,12 @@ const categorySchema = new Schema<ICategory>({
   title: { type: String }
 })
 
-const bannerImageSchema = new Schema<IBannerImage>({
-  public_id: { type: String },
-  url: { type: String }
-})
-
 const layoutSchema = new Schema<ILayout>({
   type: { type: String },
   faq: [faqSchema],
   categories: [categorySchema],
   banner: {
-    image: bannerImageSchema,
+    image: { type: String },
     title: { type: String },
     subTitle: { type: String }
   }

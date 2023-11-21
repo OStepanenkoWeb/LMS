@@ -1,7 +1,7 @@
 // get user by id
 import { type NextFunction, type Request, type Response } from 'express'
 import { redis } from '../utils/redis'
-import userModel from '../models/user.model'
+import userModel, {IUser} from '../models/user.model'
 import ErrorHandler from '../utils/errorHandler'
 
 export const getUserById = async (id: string, res: Response): Promise<void> => {
@@ -29,14 +29,16 @@ export const getAllUsersService = async (req: Request, res: Response, next: Next
 
 // update user role
 export const updateUserRoleService = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  const { id, role } = req.body
-  const user = await userModel.findByIdAndUpdate(id, { role }, { new: true })
+  const { email, role } = req.body
+  const user = await userModel.findOne({ email }) as IUser
 
-  await redis.set(id, JSON.stringify(user))
+  const updatedUser = await userModel.findByIdAndUpdate(user._id, { role }, { new: true })
+
+  await redis.set(user._id, JSON.stringify(updatedUser))
 
   res.status(210).json({
     success: true,
-    user
+    user: updatedUser
   })
 }
 

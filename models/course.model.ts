@@ -47,6 +47,7 @@ export interface ICourse extends Document {
   courseData: ICourseData[]
   ratings?: number
   purchased?: number
+  categories?: string
 }
 
 const reviewSchema = new Schema<IReview>({
@@ -95,6 +96,7 @@ const courseSchema = new Schema<ICourse>({
     type: Number,
     required: true
   },
+  categories: {type: String},
   estimatedPrice: Number,
   thumbnail: {
     type: String,

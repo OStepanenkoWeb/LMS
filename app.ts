@@ -14,26 +14,27 @@ import cookieSession from 'cookie-session'
 require('dotenv').config()
 export const app = express()
 
-app.use(
-    cookieSession({
-      sameSite: 'none',
-    }),
-);
-
 // body parser
 
 app.use(express.json({ limit: '50mb' }))
-// cookie parser
 
+// cookie parser
 app.use(cookieParser())
 
 // cors
+
 app.use(cors({
   origin: process.env.ORIGIN || '',
   credentials: true
 }))
-
 app.use(express.static(path.join(__dirname, '/public')))
+
+app.use(
+    cookieSession({
+      sameSite: 'none',
+      keys: ['key1', 'key2']
+    }),
+);
 
 // routes
 

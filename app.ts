@@ -9,7 +9,6 @@ import notificationRouter from './routes/notification.route'
 import analyticsRouter from './routes/analytics.route'
 import layoutRouter from './routes/layout.route'
 import path from 'path'
-import cookieSession from 'cookie-session'
 
 require('dotenv').config()
 export const app = express()
@@ -28,13 +27,6 @@ app.use(cors({
   credentials: true
 }))
 app.use(express.static(path.join(__dirname, '/public')))
-
-app.use(
-    cookieSession({
-      sameSite: 'none',
-      keys: ['key1', 'key2']
-    }),
-);
 
 // routes
 

@@ -9,6 +9,6 @@ layoutRouter.post('/create-layout', updateAccessToken, isAuthenticated, authoriz
 
 layoutRouter.put('/edit-layout', updateAccessToken, isAuthenticated, authorizeRoles('admin'), editLayout)
 
-layoutRouter.get('/get-layout/:type', updateAccessToken, isAuthenticated, getLayoutByType)
+layoutRouter.get('/get-layout/:type', getLayoutByType)
 
 export default layoutRouter

@@ -179,6 +179,7 @@ export const logoutUser = CatchAsyncError(async (req: Request, res: Response, ne
 export const updateAccessToken = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
   try {
     const refreshToken = req.cookies.refresh_token as string
+
     const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN as string) as JwtPayload
 
     const message = 'Could not refresh token'

@@ -122,7 +122,7 @@ export const editLayoutService = async (req: Request, res: Response, next: NextF
 export const getLayoutByTypeService = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const type= req.params.type as string
   const layout = await LayoutModel.findOne({type})
-console.log(layout, type)
+
   res.status(200).json({
     success: true,
     layout

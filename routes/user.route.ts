@@ -21,7 +21,7 @@ userRouter.get('/logout', isAuthenticated, logoutUser)
 
 userRouter.get('/refresh-token', updateAccessToken)
 
-userRouter.get('/me', updateAccessToken, isAuthenticated, getUserInfo)
+userRouter.get('/me', isAuthenticated, getUserInfo)
 
 userRouter.post('/social-auth', socialAuth)
 

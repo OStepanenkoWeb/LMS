@@ -1,5 +1,6 @@
 import mongoose, { type Document, type Model, Schema } from 'mongoose'
 import { type IUser } from './user.model'
+import {ICategory} from "./layout.model";
 
 export interface IComment extends Document {
   user: IUser
@@ -35,7 +36,7 @@ interface ICourseData extends Document {
 export interface ICourse extends Document {
   name: string
   description?: string
-  price: number
+  price: string
   estimatedPrice?: number
   thumbnail: string
   tags: string[]
@@ -83,6 +84,10 @@ const courseDataSchema = new Schema<ICourseData>({
   questions: [commentSchema]
 })
 
+const categorySchema = new Schema<ICategory>({
+  title: { type: String }
+})
+
 const courseSchema = new Schema<ICourse>({
   name: {
     type: String,
@@ -93,10 +98,12 @@ const courseSchema = new Schema<ICourse>({
     required: true
   },
   price: {
-    type: Number,
+    type: String,
     required: true
   },
-  categories: {type: String},
+  categories: {
+    type: [categorySchema]
+  },
   estimatedPrice: Number,
   thumbnail: {
     type: String,

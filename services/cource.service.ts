@@ -10,7 +10,7 @@ import courseModel from '../models/course.model'
 // create course
 export const createCourse = async (req: Request, res: Response): Promise<void> => {
   const data = req.body
-
+console.log(req.body)
   const course = await CourseModel.create(data)
 
   res.status(201).json({

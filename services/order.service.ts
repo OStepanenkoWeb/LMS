@@ -1,24 +1,37 @@
-import { CatchAsyncError } from '../middleware/catchAsyncError'
 import { type NextFunction, type Request, type Response } from 'express'
 import CourseModel, { type ICourse } from '../models/course.model'
 import OrderModel, { type IOrder } from '../models/order.model'
 import userModel, { type IUser } from '../models/user.model'
 import ErrorHandler from '../utils/errorHandler'
-import path from 'path'
 import sendMail from '../utils/sendMail'
 import NotificationModel from '../models/notification.model'
-import courseModel from '../models/course.model'
 import orderModel from '../models/order.model'
+import {redis} from "../utils/redis";
+require('dotenv').config()
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
 // create order
 export const createOrderService = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { courseId, paymentInfo } = req.body as IOrder
 
+  if(paymentInfo){
+    if('id' in paymentInfo){
+      const paymentIntentsId = paymentInfo.id
+      const paymentIntents = await stripe.paymentIntents.retrieve(
+          paymentIntentsId
+      )
+
+      if(paymentIntents.status !== 'succeeded') {
+        next(new ErrorHandler('Платеж не авторизован', 400))
+      }
+    }
+  }
+
   const user = await userModel.findById(req.user?._id) as IUser
 
   const courseExistInUser = user?.courses.some((course: any) => course._id.equals(courseId))
 
-  if (!courseExistInUser) {
+  if (courseExistInUser) {
     next(new ErrorHandler('You have already purchased this course', 400))
     return
   }
@@ -38,18 +51,19 @@ export const createOrderService = async (req: Request, res: Response, next: Next
 
   const mailData = {
     order: {
-      _id: course._id.toString().slice(0, 6),
+      id: course._id.toString().slice(0, 6),
       name: course.name,
       price: course.price,
       date: new Date().toLocaleDateString('ru-RU', { year: 'numeric', month: 'long', day: 'numeric' })
     }
   }
-
+  console.log(mailData)
+  console.log(user.email)
   try {
     if (user) {
       await sendMail({
         email: user.email,
-        subject: 'Question Reply',
+        subject: 'Order Confirmation',
         template: 'order-confirmation.ejs',
         data: mailData
       })
@@ -60,6 +74,8 @@ export const createOrderService = async (req: Request, res: Response, next: Next
   }
 
   user?.courses.push(course?._id)
+
+  await redis.set(req.user?._id, JSON.stringify(user))
 
   await user?.save()
 
@@ -85,8 +101,28 @@ export const createOrderService = async (req: Request, res: Response, next: Next
 export const getAllOrdersService = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const orders = await orderModel.find().sort({ createdAt: -1 })
 
-  res.status(210).json({
+  res.status(200).json({
     success: true,
     orders
   })
 }
+
+// new payment
+export const newPaymentService = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  const myPayment = await stripe.paymentIntents.create({
+    amount: req.body.amount,
+    currency: 'USD',
+    metadata: {
+      company: 'LMS'
+    },
+    automatic_payment_methods: {
+      enabled: true
+    }
+  })
+
+  res.status(200).json({
+    success: true,
+    client_secret: myPayment.client_secret
+  })
+}
+

@@ -1,5 +1,5 @@
 import { type Response, type Request, type NextFunction } from 'express'
-import CourseModel, { type IComment, type ICourse } from '../models/course.model'
+import CourseModel, { type ICourse } from '../models/course.model'
 import { redis } from '../utils/redis'
 import ErrorHandler from '../utils/errorHandler'
 import mongoose from 'mongoose'
@@ -62,7 +62,6 @@ export const getCourseById = async (req: Request, res: Response): Promise<void> 
 
 // get all courses
 export const getAllCoursesList = async (req: Request, res: Response): Promise<void> => {
-  const isCacheExist = await redis.get('allCourses')
 
   let courses = null
 
@@ -83,7 +82,8 @@ export const getCourseByUserId = async (req: Request, res: Response, next: NextF
 
   if (userCourseList) {
     const courseExists = userCourseList.find((course: any): boolean => {
-      return course.courseId.equals(courseId)
+
+      return course._id === courseId
     })
 
     if (!courseExists) {

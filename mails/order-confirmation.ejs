@@ -42,7 +42,7 @@
         }
         .course-info {
             margin: auto;
-            padding: 20px 0px;
+            padding: 20px 0;
             width: 100%;
             background-color: #fff;
             border-radius: 10px;
@@ -100,7 +100,7 @@
             text-transform: uppercase;
             color: #0000006c;
             font-size: 16px;
-            padding: 5px 0px;
+            padding: 5px 0;
             width: 1%;
             font-weight: 600 !important;
         }
@@ -124,7 +124,7 @@
         td.col-2 {
             width: 100%;
             text-align: left;
-            padding: 0px;
+            padding: 0;
             margin: 0;
         }
         .m-auto {
@@ -152,10 +152,10 @@
         <table style="border-bottom: 1px solid #0000002f">
             <tr>
                 <td>
-                    Order #: <%= data._id %>
+                    Order #: <%= order.id %>
                 </td>
                 <td>
-                    Order Date: <%= data.date %>
+                    Order Date: <%= order.date %>
                 </td>
             </tr>
         </table>
@@ -168,15 +168,15 @@
         </table>
         <table style="width: 90%; margin: auto; display: block;">
             <tr>
-                <td class="second-td"><%= data.name %></td>
+                <td class="second-td"><%= order.name %></td>
                 <td class="second-td">1</td>
-                <td class="second-td"><%= data.price %></td>
+                <td class="second-td"><%= order.price %></td>
             </tr>
         </table>
         <table class="table-row" style="border-top: 1px solid #00000029">
             <tr>
                 <td class="col-2">Subtotal</td>
-                <td class="col-2">$<%= data.price %></td>
+                <td class="col-2">$<%= order.price %></td>
             </tr>
         </table>
     </div>

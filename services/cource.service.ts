@@ -44,15 +44,9 @@ export const getCourseById = async (req: Request, res: Response): Promise<void> 
 
   let course = null
 
-  if (isCacheExist) {
-    course = JSON.parse(isCacheExist)
-  } else {
-    course = await CourseModel
+  course = await CourseModel
       .findById(req.params.id)
       .select('-courseData.videoUrl -courseData.suggestion -courseData.questions -courseData.links')
-
-    await redis.set(courseId, JSON.stringify(course))
-  }
 
   res.status(200).json({
     success: true,
@@ -240,7 +234,7 @@ export const addReviewCourseService = async (req: Request, res: Response, next: 
   const courseId = req.params.id
 
   // check if courseId already exist in userCourseList based on _id
-  const courseExist = userCourseList?.some((course: any) => course._id.equals(courseId))
+  const courseExist = userCourseList?.some((course: any) => course._id ===courseId)
 
   if (!courseExist) {
     next(new ErrorHandler('You are not eligible to access this course', 500))

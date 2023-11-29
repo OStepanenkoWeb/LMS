@@ -52,7 +52,7 @@ export interface ICourse extends Document {
 }
 
 const reviewSchema = new Schema<IReview>({
-  user: String,
+  user: Object,
   rating: {
     type: Number,
     default: 0
@@ -70,7 +70,7 @@ const commentSchema = new Schema<IComment>({
   user: Object,
   question: String,
   questionReplies: [Object]
-})
+}, {timestamps: true})
 
 const courseDataSchema = new Schema<ICourseData>({
   title: String,

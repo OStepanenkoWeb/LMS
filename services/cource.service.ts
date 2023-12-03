@@ -176,7 +176,9 @@ export const addAnswerQuestionService = async (req: Request, res: Response, next
   // create a new answer object
   const newAnswer: any = {
     user: req.user,
-    question: answer
+    question: answer,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   }
 
   // add this answer to our course content
@@ -193,8 +195,8 @@ export const addAnswerQuestionService = async (req: Request, res: Response, next
     // create a notification
     await NotificationModel.create({
       user: req.user?._id,
-      title: 'New Question Reply Received',
-      message: `You have a new question reply in ${courseContent?.title}`
+      title: 'Получен новый ответ на вопрос',
+      message: `У вас есть новый ответ на вопрос ${courseContent?.title}`
     })
   } else {
     const data = {
@@ -300,7 +302,9 @@ export const addReplyToReviewService = async (req: Request, res: Response, next:
 
   const replyData: any = {
     user: req.user,
-    comment
+    comment,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   }
 
   if (!review.commentReplies) {

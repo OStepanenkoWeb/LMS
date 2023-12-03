@@ -26,6 +26,11 @@ export const updateNotificationsService = CatchAsyncError(async (req: Request, r
   notification.status = notification.status ? 'read' : notification.status
 
   await notification.save()
+
+  const notifications = await NotificationModel.find().sort({
+    createdAt: -1,
+  })
+
   res.status(201).json({
     success: true,
     notification
